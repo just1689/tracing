@@ -8,7 +8,7 @@ import (
 
 func NewSpan(traceID string, serviceName, rpcName string, d time.Duration) Span {
 	result := Span{
-		ID:     newId(),
+		ID:     NewId(),
 		Name:   rpcName,
 		Shared: true,
 		LocalEndpoint: map[string]string{

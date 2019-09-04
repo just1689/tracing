@@ -31,7 +31,7 @@ func StartTracing(c Config) {
 		RetryErr:        c.RetryErr,
 	}
 	GlobalPublisher = p
-	go p.run()
+	p.run()
 	return
 }
 

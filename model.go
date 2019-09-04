@@ -55,7 +55,7 @@ type Tags map[string]string
 
 const traceIDLen = 16
 
-func newId() string {
+func NewId() string {
 	return randString(traceIDLen)
 }
 

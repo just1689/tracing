@@ -81,7 +81,7 @@ func (p *publisher) sendNow(s []Span) {
 		return
 	}
 	r := bytes.NewReader(b)
-	resp, err := http.Post(p.url, "Application/json", r)
+	resp, err := http.Post(p.url, "application/json", r)
 	if err != nil || resp.StatusCode < 200 || resp.StatusCode > 299 {
 		logrus.Errorln(resp.StatusCode, err)
 		b, err = ioutil.ReadAll(resp.Body)

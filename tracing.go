@@ -3,10 +3,7 @@ package tracing
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
-	"net/http"
 	"time"
 )
 
@@ -66,32 +63,28 @@ func (p *publisher) run() {
 		}
 
 		if readyToSend {
-			p.sendNow(arr)
+			p.postSpans(arr)
 			arr = make([]Span, 0)
 			lastSend = time.Now()
 		}
 	}
 }
 
-func (p *publisher) sendNow(s []Span) {
+func (p *publisher) postSpans(s []Span) {
 	b, err := json.Marshal(s)
 	if err != nil {
 		logrus.Errorln(err)
 		return
 	}
 	r := bytes.NewReader(b)
-	resp, err := http.Post(p.url, "application/json", r)
-	if err != nil || resp.StatusCode < 200 || resp.StatusCode > 299 {
-		logrus.Errorln(resp.StatusCode, err)
-		b, err = ioutil.ReadAll(resp.Body)
-		fmt.Println(string(b))
+	err = httpPostJson(p.url, r)
+	if err != nil {
 		if p.RetryErr {
 			p.EnqueueAll(s)
 		}
 		if p.SleepBetweenErr != 0 {
 			time.Sleep(time.Duration(p.SleepBetweenErr) * time.Second)
 		}
-		return
 	}
 
 }

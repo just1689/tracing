@@ -55,19 +55,21 @@ func (p *publisher) EnqueueAll(all []Span) {
 func (p *publisher) run() {
 	var arr = make([]Span, 0)
 	go func() {
-		start := time.Now()
+		lastSend := time.Now()
 		for {
 			select {
 			case s := <-p.in:
 				arr = append(arr, s)
-				if len(arr) > p.flushSize || time.Since(start) > p.flushTimeout {
+				if len(arr) >= p.flushSize || time.Since(lastSend) > p.flushTimeout {
 					p.sendNow(arr)
 					arr = make([]Span, 0)
+					lastSend = time.Now()
 				}
 			case <-time.After(p.flushTimeout):
 				if len(arr) > 0 {
 					p.sendNow(arr)
 					arr = make([]Span, 0)
+					lastSend = time.Now()
 				}
 			}
 		}
